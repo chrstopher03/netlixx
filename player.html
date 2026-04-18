@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Player Pro</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+  background:#000;
+  font-family:'Inter',sans-serif;
+}
+
+/* CONTENEDOR */
+.container{
+  position:relative;
+  width:100%;
+  height:100vh;
+  overflow:hidden;
+}
+
+/* VIDEO */
+video{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+/* OVERLAY */
+.top, .bottom{
+  position:absolute;
+  width:100%;
+  left:0;
+  z-index:10;
+  transition:opacity .3s;
+}
+
+.top{
+  top:0;
+  padding:15px 25px;
+  background:linear-gradient(to bottom, rgba(0,0,0,.8), transparent);
+}
+
+.bottom{
+  bottom:0;
+  padding:15px 25px;
+  background:linear-gradient(to top, rgba(0,0,0,.9), transparent);
+}
+
+/* BACK */
+.back{
+  color:#fff;
+  font-size:14px;
+  cursor:pointer;
+}
+
+/* PLAY CENTRAL */
+.big-play{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  width:80px;
+  height:80px;
+  border-radius:50%;
+  background:rgba(255,255,255,0.15);
+  backdrop-filter:blur(8px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+.big-play svg{width:30px;fill:#fff;}
+
+/* PROGRESS */
+.progress{
+  height:5px;
+  background:#444;
+  cursor:pointer;
+  margin-bottom:10px;
+}
+.bar{
+  height:100%;
+  width:0;
+  background:#e50914;
+}
+
+/* CONTROLES */
+.controls{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.left,.right{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.btn{
+  cursor:pointer;
+  color:#fff;
+  font-size:14px;
+}
+
+/* VOLUMEN */
+input[type=range]{width:80px;}
+
+/* TIEMPO */
+.time{
+  color:#ccc;
+  font-size:12px;
+}
+
+/* SELECT */
+select{
+  background:transparent;
+  color:#fff;
+  border:none;
+}
+
+/* HIDE */
+.hide{opacity:0}
+
+/* 📱 MOBILE */
+@media(max-width:768px){
+
+  .top{padding:10px 15px;}
+  .bottom{padding:10px 15px;}
+
+  .big-play{
+    width:60px;
+    height:60px;
+  }
+
+  .big-play svg{width:22px;}
+
+  .btn{font-size:12px;}
+
+  input[type=range]{width:60px;}
+
+  .time{font-size:11px;}
+
+}
+</style>
+</head>
+
+<body>
+
+<div class="container" id="container">
+
+<video id="video" playsinline></video>
+
+<!-- TOP -->
+<div class="top" id="top">
+  <div class="back" onclick="history.back()">← Volver</div>
+</div>
+
+<!-- PLAY -->
+<div class="big-play" id="bigPlay">
+  <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+</div>
+
+<!-- CONTROLES -->
+<div class="bottom" id="controls">
+
+  <div class="progress" id="progress">
+    <div class="bar" id="bar"></div>
+  </div>
+
+  <div class="controls">
+
+    <div class="left">
+      <div class="btn" id="play">▶</div>
+      <div class="time" id="time">0:00 / 0:00</div>
+      🔊 <input type="range" id="volume" min="0" max="1" step="0.1">
+    </div>
+
+    <div class="right">
+      <select id="speed">
+        <option value="1">1x</option>
+        <option value="1.5">1.5x</option>
+        <option value="2">2x</option>
+      </select>
+      <div class="btn" onclick="video.requestFullscreen()">⛶</div>
+    </div>
+
+  </div>
+
+</div>
+
+</div>
+
+<script>
+const video = document.getElementById("video");
+const playBtn = document.getElementById("play");
+const bigPlay = document.getElementById("bigPlay");
+const bar = document.getElementById("bar");
+const progress = document.getElementById("progress");
+const volume = document.getElementById("volume");
+const speed = document.getElementById("speed");
+const controls = document.getElementById("controls");
+const topBar = document.getElementById("top");
+const container = document.getElementById("container");
+const timeDisplay = document.getElementById("time");
+
+/* VIDEO */
+video.src = "2.mp4";
+
+/* PLAY */
+function toggle(){
+  if(video.paused){
+    video.play();
+    bigPlay.style.display="none";
+  }else{
+    video.pause();
+    bigPlay.style.display="flex";
+  }
+}
+playBtn.onclick = toggle;
+bigPlay.onclick = toggle;
+video.onclick = toggle;
+
+/* PROGRESO */
+video.ontimeupdate = ()=>{
+  if(video.duration){
+    bar.style.width = (video.currentTime/video.duration)*100+"%";
+
+    const f=t=>{
+      const m=Math.floor(t/60);
+      const s=Math.floor(t%60).toString().padStart(2,"0");
+      return m+":"+s;
+    };
+
+    timeDisplay.innerText = f(video.currentTime)+" / "+f(video.duration);
+  }
+};
+
+/* SEEK */
+progress.onclick = e=>{
+  const rect = progress.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  video.currentTime = (x/rect.width)*video.duration;
+};
+
+/* VOLUMEN */
+volume.value=1;
+volume.oninput=()=>video.volume=volume.value;
+
+/* VELOCIDAD */
+speed.onchange=()=>video.playbackRate=speed.value;
+
+/* AUTO HIDE */
+let t;
+function show(){
+  controls.classList.remove("hide");
+  topBar.classList.remove("hide");
+  clearTimeout(t);
+  t=setTimeout(()=>{
+    controls.classList.add("hide");
+    topBar.classList.add("hide");
+  },2500);
+}
+container.onmousemove=show;
+container.onclick=show;
+show();
+
+/* ERROR */
+video.onerror=()=>alert("No se encontró 2.mp4");
+</script>
+
+</body>
+</html>

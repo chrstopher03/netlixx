@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Netflix cop</title>
+        <link rel="icon" href="images (1).png">
+
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+  font-family:'Roboto',sans-serif;
+  background:#141414;
+  color:#fff;
+  overflow-x:hidden;
+}
+
+/* NAV */
+.nav{
+  position:fixed;
+  top:0;
+  width:100%;
+  padding:18px 60px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  z-index:1000;
+  transition:0.4s;
+}
+
+.nav.active{
+  background:#141414;
+}
+
+.logo{
+  color:#e50914;
+  font-size:26px;
+  font-weight:700;
+}
+
+.user img{
+  width:35px;
+  border-radius:4px;
+}
+
+/* HERO */
+.hero{
+  height:95vh;
+  background:
+    linear-gradient(to top,#141414 5%,transparent),
+    linear-gradient(to right,rgba(0,0,0,0.85),transparent),
+    url('1.jpeg') center/cover no-repeat;
+  display:flex;
+  align-items:center;
+  padding:0 60px;
+}
+
+.hero-content{
+  max-width:500px;
+  animation:fadeIn 1.5s ease;
+}
+
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(30px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+.hero h1{font-size:60px;font-weight:700;}
+.hero p{margin:15px 0;color:#ddd;line-height:1.5;}
+
+.buttons{display:flex;gap:10px;}
+
+.btn{
+  padding:12px 26px;
+  border:none;
+  border-radius:4px;
+  font-weight:600;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.btn:hover{
+  transform:scale(1.05);
+  opacity:0.9;
+}
+
+.play{background:#fff;color:#000;}
+.info{background:rgba(109,109,110,0.7);color:#fff;}
+
+/* CONTENIDO */
+.container{
+  margin-top:-120px;
+  padding:0 60px 40px;
+}
+
+.row{margin-bottom:50px;}
+.row h2{margin-bottom:15px;font-size:22px;}
+
+.cards{
+  display:flex;
+  gap:12px;
+  overflow-x:auto;
+  scroll-behavior:smooth;
+}
+
+.cards::-webkit-scrollbar{display:none;}
+
+/* CARD */
+.card{
+  position:relative;
+  min-width:220px;
+  height:320px;
+  border-radius:6px;
+  overflow:hidden;
+  cursor:pointer;
+  transition:0.3s ease;
+}
+
+.card img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+/* HOVER */
+.card:hover{
+  transform:scale(1.2);
+  z-index:100;
+}
+
+/* PREVIEW */
+.preview{
+  position:absolute;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  top:0;
+  left:0;
+  opacity:0;
+  transition:0.4s;
+}
+
+.card:hover .preview{opacity:1;}
+.card:hover img{opacity:0;}
+
+/* INFO */
+.card-info{
+  position:absolute;
+  bottom:0;
+  width:100%;
+  padding:12px;
+  background:linear-gradient(to top, rgba(0,0,0,0.95), transparent);
+  opacity:0;
+  transform:translateY(20px);
+  transition:0.3s;
+}
+
+.card:hover .card-info{
+  opacity:1;
+  transform:translateY(0);
+}
+
+/* BOTONES */
+.actions{
+  display:flex;
+  gap:8px;
+  margin-top:8px;
+}
+
+.circle{
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  border:1px solid #fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+
+.circle:hover{
+  background:#fff;
+  color:#000;
+}
+
+/* BARRA PROGRESO REAL */
+.progress{
+  position:absolute;
+  bottom:0;
+  left:0;
+  height:4px;
+  background:#e50914;
+  transition:0.3s;
+}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .hero h1{font-size:38px;}
+  .nav{padding:15px;}
+  .container{padding:20px;}
+  .card{min-width:150px;height:230px;}
+}
+</style>
+</head>
+
+<body>
+
+<div class="nav" id="nav">
+  <div class="logo">NETFLIX</div>
+  <div class="user">
+    <img src="https://i.pravatar.cc/150?img=5">
+  </div>
+</div>
+
+<section class="hero">
+  <div class="hero-content">
+    <h1>Nuestra Historia</h1>
+    <p>La historia más real contigo.</p>
+
+    <div class="buttons">
+      <button class="btn play" onclick="irPlayer('video1.mp4')">▶ Reproducir</button>
+      <button class="btn info">Más info</button>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+
+  <div class="row">
+    <h2>Seguir viendo</h2>
+    <div class="cards" id="seguir"></div>
+  </div>
+
+  <div class="row">
+    <h2>Popular ❤️</h2>
+    <div class="cards">
+
+      <div class="card" data-video="video1.mp4">
+        <img src="7.jpeg">
+        <video class="preview" muted loop></video>
+
+        <div class="card-info">
+          <h4>Recuerdo 1</h4>
+          <div class="actions">
+            <div class="circle" onclick="irPlayer('video1.mp4')">▶</div>
+            <div class="circle">＋</div>
+            <div class="circle">❤</div>
+          </div>
+        </div>
+      </div>
+<div class="card" data-video="video1.mp4">
+        <img src="8.jpeg">
+        <video class="preview" muted loop></video>
+
+        <div class="card-info">
+          <h4>Recuerdo 1</h4>
+          <div class="actions">
+            <div class="circle" onclick="irPlayer('video1.mp4')">▶</div>
+            <div class="circle">＋</div>
+            <div class="circle">❤</div>
+          </div>
+        </div>
+      </div>
+      <div class="card" data-video="video1.mp4">
+        <img src="9.jpeg">
+        <video class="preview" muted loop></video>
+
+        <div class="card-info">
+          <h4>Recuerdo 1</h4>
+          <div class="actions">
+            <div class="circle" onclick="irPlayer('video1.mp4')">▶</div>
+            <div class="circle">＋</div>
+            <div class="circle">❤</div>
+          </div>
+        </div>
+      </div>
+      <div class="card" data-video="video1.mp4">
+        <img src="11.jpeg">
+        <video class="preview" muted loop></video>
+
+        <div class="card-info">
+          <h4>Recuerdo 1</h4>
+          <div class="actions">
+            <div class="circle" onclick="irPlayer('video1.mp4')">▶</div>
+            <div class="circle">＋</div>
+            <div class="circle">❤</div>
+          </div>
+        </div>
+      </div>
+      <div class="card" data-video="video1.mp4">
+        <img src="12.jpeg">
+        <video class="preview" muted loop></video>
+
+        <div class="card-info">
+          <h4>Recuerdo 1</h4>
+          <div class="actions">
+            <div class="circle" onclick="irPlayer('video1.mp4')">▶</div>
+            <div class="circle">＋</div>
+            <div class="circle">❤</div>
+          </div>
+        </div>
+      </div>
+      <div class="card" data-video="video1.mp4">
+        <img src="13.jpeg">
+        <video class="preview" muted loop></video>
+
+        <div class="card-info">
+          <h4>Recuerdo 1</h4>
+          <div class="actions">
+            <div class="circle" onclick="irPlayer('video1.mp4')">▶</div>
+            <div class="circle">＋</div>
+            <div class="circle">❤</div>
+          </div>
+        </div>
+      </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+
+/* NAV */
+window.addEventListener("scroll",()=>{
+  const nav=document.getElementById("nav");
+  nav.classList.toggle("active",window.scrollY>50);
+});
+
+/* IR PLAYER */
+function irPlayer(src){
+  localStorage.setItem("videoActual", src);
+
+  if(!localStorage.getItem(src)){
+    localStorage.setItem(src, "0");
+  }
+
+  window.location.href="player.html";
+}
+
+/* PREVIEW */
+document.querySelectorAll(".card").forEach(card=>{
+  let timeout;
+
+  card.addEventListener("mouseenter",()=>{
+    timeout=setTimeout(()=>{
+      const v=card.querySelector(".preview");
+      const src=card.dataset.video;
+      if(v){
+        v.src=src;
+        v.play().catch(()=>{});
+      }
+    },500);
+  });
+
+  card.addEventListener("mouseleave",()=>{
+    clearTimeout(timeout);
+    const v=card.querySelector(".preview");
+    if(v){
+      v.pause();
+      v.currentTime=0;
+    }
+  });
+});
+
+/* SEGUIR VIENDO (REAL) */
+window.onload=()=>{
+  const seguir=document.getElementById("seguir");
+  seguir.innerHTML="";
+
+  const contenido = [
+    {video:"video2.mp4", img:"7.jpeg"},
+    {video:"video2.mp4", img:"10.jpeg"},
+    {video:"video2.mp4", img:"9.jpeg"}
+  ];
+
+  contenido.forEach(item=>{
+
+    let progreso = localStorage.getItem(item.video);
+
+    if(progreso === null) return;
+
+    seguir.innerHTML+=`
+      <div class="card" onclick="irPlayer('${item.video}')">
+        <img src="${item.img}">
+        <div class="progress" style="width:${progreso}%"></div>
+      </div>
+    `;
+  });
+};
+
+</script>
+
+</body>
+</html>
