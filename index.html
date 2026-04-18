@@ -57,7 +57,21 @@ body{
   align-items:center;
   padding:0 60px;
 }
+.cards{
+  display:flex;
+  gap:12px;
+  overflow-x:auto;
+  scroll-behavior:smooth;
+  padding-bottom:10px;
+}
 
+.cards > .card{
+  flex:0 0 auto;
+}
+
+.cards img{
+  display:block;
+}
 .hero-content{
   max-width:500px;
   animation:fadeIn 1.5s ease;
@@ -366,11 +380,9 @@ document.querySelectorAll(".card").forEach(card=>{
     }
   });
 });
-
-/* SEGUIR VIENDO (REAL) */
-window.onload=()=>{
-  const seguir=document.getElementById("seguir");
-  seguir.innerHTML="";
+window.onload = () => {
+  const seguir = document.getElementById("seguir");
+  seguir.innerHTML = "";
 
   const contenido = [
     {video:"video2.mp4", img:"7.jpeg"},
@@ -378,18 +390,20 @@ window.onload=()=>{
     {video:"video2.mp4", img:"9.jpeg"}
   ];
 
-  contenido.forEach(item=>{
-
+  contenido.forEach(item => {
     let progreso = localStorage.getItem(item.video);
+    if (progreso === null) progreso = 0;
 
-    if(progreso === null) return;
+    const card = document.createElement("div");
+    card.className = "card";
+    card.onclick = () => irPlayer(item.video);
 
-    seguir.innerHTML+=`
-      <div class="card" onclick="irPlayer('${item.video}')">
-        <img src="${item.img}">
-        <div class="progress" style="width:${progreso}%"></div>
-      </div>
+    card.innerHTML = `
+      <img src="${item.img}">
+      <div class="progress" style="width:${progreso}%"></div>
     `;
+
+    seguir.appendChild(card);
   });
 };
 
